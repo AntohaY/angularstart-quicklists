@@ -3,6 +3,8 @@ import { ModalComponent } from '../shared/ui/modal.component';
 import { Checklist } from '../shared/interfaces/checklist';
 import { FormBuilder } from '@angular/forms';
 import { FormModalComponent } from '../shared/ui/form-modal.component';
+import { ChecklistService } from '../shared/data-access/checklist.service';
+import { ChecklistListComponent } from './ui/checklist-list.component';
 
 @Component({
   standalone: true,
@@ -13,9 +15,14 @@ import { FormModalComponent } from '../shared/ui/form-modal.component';
       <button (click)="checklistBeingEdited.set({})">Add Checklist</button>
     </header>
 
+    <section>
+      <h2>Your checklists</h2>
+      <app-checklist-list [checklists]="checklistService.checklists()"></app-checklist-list>
+    </section>
+
     <app-modal [isOpen]="!!checklistBeingEdited()">
       <ng-template>
-        <app-form-modal
+      <app-form-modal
           [title]="
             checklistBeingEdited()?.title
               ? checklistBeingEdited()!.title!
@@ -23,13 +30,15 @@ import { FormModalComponent } from '../shared/ui/form-modal.component';
           "
           [formGroup]="checklistForm"
           (close)="checklistBeingEdited.set(null)"
+          (save)="checklistService.add$.next(checklistForm.getRawValue())"
         />
       </ng-template>
     </app-modal>
   `,
-  imports: [ModalComponent, FormModalComponent],
+  imports: [ModalComponent, FormModalComponent, ChecklistListComponent],
 })
 export default class HomeComponent {
+    checklistService = inject(ChecklistService);
     checklistBeingEdited = signal<Partial<Checklist> | null>(null);
 
     formBuilder = inject(FormBuilder);
