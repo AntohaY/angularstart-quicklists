@@ -4,6 +4,13 @@ import { Checklist, RemoveChecklist } from '../../shared/interfaces/checklist';
 
 @Component({
   standalone: true,
+  styles: [
+    `
+      button {
+        margin-left: 1rem;
+      }
+    `,
+  ],
   selector: 'app-checklist-header',
   template: `
     <header>

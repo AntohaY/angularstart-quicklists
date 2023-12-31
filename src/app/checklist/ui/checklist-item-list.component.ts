@@ -3,6 +3,27 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
 
 @Component({
   standalone: true,
+  styles: [
+    `
+      ul {
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        font-size: 1.5em;
+        display: flex;
+        justify-content: space-between;
+        background: var(--color-light);
+        list-style-type: none;
+        margin-bottom: 1rem;
+        padding: 1rem;
+
+        button {
+          margin-left: 1rem;
+        }
+      }
+    `,
+  ],
   selector: 'app-checklist-item-list',
   template: `
     <section>
@@ -17,6 +38,8 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
           </div>
           <div>
             <button (click)="toggle.emit(item.id)">Toggle</button>
+            <button (click)="edit.emit(item)">Edit</button>
+            <button (click)="delete.emit(item.id)">Delete</button>
           </div>
         </li>
         } @empty {
@@ -32,4 +55,6 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
 export class ChecklistItemListComponent {
   @Input({ required: true }) checklistItems!: ChecklistItem[];
   @Output() toggle = new EventEmitter<RemoveChecklistItem>();
+  @Output() delete = new EventEmitter<RemoveChecklistItem>();
+  @Output() edit = new EventEmitter<ChecklistItem>();
 }
