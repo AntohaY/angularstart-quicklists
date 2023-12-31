@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/checklist-item';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   standalone: true,
@@ -37,9 +38,9 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
             {{ item.title }}
           </div>
           <div>
-            <button (click)="toggle.emit(item.id)">Toggle</button>
-            <button (click)="edit.emit(item)">Edit</button>
-            <button (click)="delete.emit(item.id)">Delete</button>
+            <button mat-raised-button color="primary"(click)="toggle.emit(item.id)">Toggle</button>
+            <button mat-raised-button color="accent" (click)="edit.emit(item)">Edit</button>
+            <button mat-raised-button color="warn" (click)="delete.emit(item.id)">Delete</button>
           </div>
         </li>
         } @empty {
@@ -51,6 +52,7 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
       </ul>
     </section>
   `,
+  imports: [MatButtonModule],
 })
 export class ChecklistItemListComponent {
   @Input({ required: true }) checklistItems!: ChecklistItem[];

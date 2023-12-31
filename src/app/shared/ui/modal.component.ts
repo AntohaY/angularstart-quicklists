@@ -1,4 +1,5 @@
-import { Dialog } from '@angular/cdk/dialog';
+import { MatDialogContent } from '@angular/material/dialog';
+
 import {
   Component,
   ContentChild,
@@ -6,11 +7,13 @@ import {
   TemplateRef,
   inject,
 } from '@angular/core';
+import { Dialog } from '@angular/cdk/dialog';
 
 @Component({
   standalone: true,
   selector: 'app-modal',
-  template: `<div></div>`,
+  imports: [MatDialogContent],
+  template: `<mat-dialog-content class="mat-typography"></mat-dialog-content>`,
 })
 export class ModalComponent {
   dialog = inject(Dialog);

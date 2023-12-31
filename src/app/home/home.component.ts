@@ -5,6 +5,7 @@ import { FormBuilder } from '@angular/forms';
 import { FormModalComponent } from '../shared/ui/form-modal.component';
 import { ChecklistService } from '../shared/data-access/checklist.service';
 import { ChecklistListComponent } from './ui/checklist-list.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   standalone: true,
@@ -12,7 +13,7 @@ import { ChecklistListComponent } from './ui/checklist-list.component';
   template: ` 
     <header>
       <h1>Quicklists</h1>
-      <button (click)="checklistBeingEdited.set({})">Add Checklist</button>
+      <button mat-raised-button (click)="checklistBeingEdited.set({})">Add Checklist</button>
     </header>
 
     <section>
@@ -47,7 +48,7 @@ import { ChecklistListComponent } from './ui/checklist-list.component';
       </ng-template>
     </app-modal>
   `,
-  imports: [ModalComponent, FormModalComponent, ChecklistListComponent],
+  imports: [ModalComponent, FormModalComponent, ChecklistListComponent, MatButtonModule],
 })
 export default class HomeComponent {
     checklistService = inject(ChecklistService);

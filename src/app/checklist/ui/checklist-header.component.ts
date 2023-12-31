@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Checklist, RemoveChecklist } from '../../shared/interfaces/checklist';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   standalone: true,
@@ -19,12 +20,12 @@ import { Checklist, RemoveChecklist } from '../../shared/interfaces/checklist';
         {{ checklist.title }}
       </h1>
       <div>
-        <button (click)="resetChecklist.emit(checklist.id)">Reset</button>
-        <button (click)="addItem.emit()">Add item</button>
+        <button mat-raised-button (click)="resetChecklist.emit(checklist.id)">Reset</button>
+        <button mat-raised-button (click)="addItem.emit()">Add item</button>
       </div>
     </header>
   `,
-  imports: [RouterLink],
+  imports: [RouterLink, MatButtonModule],
 })
 export class ChecklistHeaderComponent {
   @Input({ required: true }) checklist!: Checklist;
