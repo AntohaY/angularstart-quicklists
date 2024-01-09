@@ -1,6 +1,6 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject } from 'rxjs';
+import { Subject, EMPTY, map, merge } from 'rxjs';
 import {
   AddChecklistItem,
   ChecklistItem,
@@ -9,6 +9,7 @@ import {
 } from '../../shared/interfaces/checklist-item';
 import { RemoveChecklist } from '../../shared/interfaces/checklist';
 import { StorageService } from '../../shared/data-access/storage.service';
+import { connect } from 'ngxtension/connect';
 
 export interface ChecklistItemsState {
   checklistItems: ChecklistItem[];
@@ -47,9 +48,18 @@ export class ChecklistItemService {
   checklistRemoved$ = new Subject<RemoveChecklist>();
 
   constructor() {
-    this.add$.pipe(takeUntilDestroyed()).subscribe((checklistItem) =>
-      this.state.update((state) => ({
-        ...state,
+    const nextState$ = merge(
+      this.checklistItemsLoaded$.pipe(
+        map((checklistItems) => ({
+          checklistItems,
+          loaded: true,
+        }))
+      )
+    );
+
+    connect(this.state)
+      .with(nextState$)
+      .with(this.add$, (state, checklistItem) => ({
         checklistItems: [
           ...state.checklistItems,
           {
@@ -60,65 +70,34 @@ export class ChecklistItemService {
           },
         ],
       }))
-    );
-
-    this.edit$.pipe(takeUntilDestroyed()).subscribe((update) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.edit$, (state, update) => ({
         checklistItems: state.checklistItems.map((item) =>
           item.id === update.id ? { ...item, title: update.data.title } : item
         ),
       }))
-    )
-
-    this.remove$.pipe(takeUntilDestroyed()).subscribe((id) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.remove$, (state, id) => ({
         checklistItems: state.checklistItems.filter((item) => item.id !== id),
       }))
-    )
-
-    this.checklistRemoved$.pipe(takeUntilDestroyed()).subscribe((checklistId) =>
-      this.state.update((state) => ({
-        ...state,
-        checklistItems: state.checklistItems.filter(
-          (item) => item.checklistId !== checklistId
-        )
-      }))
-    )
-
-    this.checklistItemsLoaded$
-      .pipe(takeUntilDestroyed())
-      .subscribe((checklistItems) =>
-        this.state.update((state) => ({
-          ...state,
-          checklistItems,
-          loaded: true,
-        }))
-      );
-
-    this.toggle$.pipe(takeUntilDestroyed()).subscribe((checklistItemId) => 
-      this.state.update((state) => ({
-        ...state,
+      .with(this.toggle$, (state, checklistItemId) => ({
         checklistItems: state.checklistItems.map((item) =>
-            item.id === checklistItemId 
-            ? { ...item, checked: !item.checked} 
+          item.id === checklistItemId
+            ? { ...item, checked: !item.checked }
             : item
         ),
       }))
-    );
-
-    this.reset$.pipe(takeUntilDestroyed()).subscribe((checklistId) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.reset$, (state, checklistId) => ({
         checklistItems: state.checklistItems.map((item) =>
-            item.checklistId === checklistId ? { ...item, checked: false} : item 
+          item.checklistId === checklistId ? { ...item, checked: false } : item
         ),
       }))
-    );
+      .with(this.checklistRemoved$, (state, checklistId) => ({
+        checklistItems: state.checklistItems.filter(
+          (item) => item.checklistId !== checklistId
+        ),
+      }));
 
-     // effects
-     effect(() => {
+    // effects
+    effect(() => {
       if (this.loaded()) {
         this.storageService.saveChecklistItems(this.checklistItems());
       }
